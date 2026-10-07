@@ -1,0 +1,1209 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arquitetura de E-mails, Segurança LGPD & Sistema Themis | MLP Advogados & Live Consultoria</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --live-navy-deep: #040d1a;
+            --live-navy-surface: #06192a;
+            --live-glass-card: rgba(10, 36, 61, 0.78);
+            --live-glass-card-hover: rgba(15, 45, 75, 0.92);
+            --live-glass-border: rgba(255, 255, 255, 0.09);
+            --live-glass-border-active: rgba(0, 232, 0, 0.45);
+            --live-accent: #00e800;
+            --live-accent-glow: rgba(0, 232, 0, 0.35);
+            --live-accent-dim: rgba(0, 232, 0, 0.12);
+            --live-cyan: #00d4ff;
+            --live-cyan-dim: rgba(0, 212, 255, 0.12);
+            --live-amber: #f59e0b;
+            --live-amber-dim: rgba(245, 158, 11, 0.14);
+            --live-red: #ff3b3b;
+            --live-red-dim: rgba(255, 59, 59, 0.14);
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-muted: #94a3b8;
+            --text-caption: #64748b;
+            --glass-blur: blur(20px) saturate(180%);
+            --radius-xl: 24px;
+            --radius-lg: 16px;
+            --radius-md: 12px;
+            --radius-sm: 8px;
+            --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--live-navy-deep);
+            /* Textura elegante e sutil em SVG de malha e granulação suave */
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(0, 232, 0, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 90% 70%, rgba(0, 212, 255, 0.05) 0%, transparent 45%),
+                radial-gradient(circle at 50% 90%, rgba(10, 36, 61, 0.8) 0%, transparent 60%),
+                url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.02'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            color: var(--text-primary);
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-size: 19px;
+            line-height: 1.78;
+            letter-spacing: -0.01em;
+            overflow-x: hidden;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Top Progress Bar */
+        #scroll-progress-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.05);
+            z-index: 1000;
+        }
+
+        #scroll-progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--live-cyan) 0%, var(--live-accent) 100%);
+            box-shadow: 0 0 10px var(--live-accent-glow);
+            transition: width 0.1s ease-out;
+        }
+
+        /* Sticky Executive Header */
+        header.executive-header {
+            width: 100%;
+            position: sticky;
+            top: 5px;
+            z-index: 900;
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            background: rgba(6, 25, 42, 0.88);
+            border-bottom: 1px solid var(--live-glass-border);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: center;
+        }
+
+        .header-content {
+            width: 100%;
+            max-width: 1240px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .brand-group {
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+        }
+
+        .brand-logo-text {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: -0.02em;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .brand-logo-text span {
+            color: var(--live-accent);
+        }
+
+        .divider-pill {
+            width: 1px;
+            height: 24px;
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .client-pill {
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: var(--live-cyan);
+            background: var(--live-cyan-dim);
+            padding: 0.35rem 0.9rem;
+            border-radius: 50px;
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .header-nav {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .nav-item {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            padding: 0.4rem 0.8rem;
+            border-radius: var(--radius-sm);
+            transition: var(--transition-smooth);
+        }
+
+        .nav-item:hover {
+            color: var(--live-accent);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* Container Principal */
+        main.presentation-flow {
+            width: 100%;
+            max-width: 1240px;
+            padding: 3rem 1.5rem 6rem;
+            display: flex;
+            flex-direction: column;
+            gap: 3.5rem;
+        }
+
+        /* Hero Executive Section */
+        section.hero-banner {
+            background: var(--live-glass-card);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--live-glass-border);
+            border-radius: var(--radius-xl);
+            padding: 3.5rem 2.8rem;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+        }
+
+        section.hero-banner::before {
+            content: '';
+            position: absolute;
+            top: -100px;
+            right: -100px;
+            width: 380px;
+            height: 380px;
+            background: radial-gradient(circle, rgba(0, 232, 0, 0.18) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .badge-live-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--live-accent-dim);
+            border: 1px solid var(--live-glass-border-active);
+            color: var(--live-accent);
+            padding: 0.45rem 1.2rem;
+            border-radius: 50px;
+            font-size: 0.88rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            margin-bottom: 1.5rem;
+        }
+
+        h1.hero-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2.85rem;
+            font-weight: 700;
+            line-height: 1.22;
+            letter-spacing: -0.03em;
+            color: #ffffff;
+            margin-bottom: 1.4rem;
+        }
+
+        h1.hero-title span.highlight-green {
+            background: linear-gradient(135deg, #ffffff 10%, #d1fae5 50%, var(--live-accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        p.hero-subtitle {
+            font-size: 1.15rem;
+            color: var(--text-secondary);
+            max-width: 1040px;
+            margin-bottom: 2.2rem;
+            line-height: 1.75;
+        }
+
+        .hero-meta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.2rem;
+            padding-top: 1.8rem;
+            border-top: 1px solid var(--live-glass-border);
+        }
+
+        .meta-cell {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+
+        .meta-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .meta-val {
+            font-size: 1.05rem;
+            color: #ffffff;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Executive Cards */
+        .card-executive {
+            background: var(--live-glass-card);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--live-glass-border);
+            border-radius: var(--radius-xl);
+            padding: 3rem 2.8rem;
+            position: relative;
+            transition: var(--transition-smooth);
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+        }
+
+        .card-executive:hover {
+            border-color: rgba(0, 232, 0, 0.3);
+            box-shadow: 0 20px 48px rgba(0, 232, 0, 0.08);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            padding-bottom: 1.2rem;
+            border-bottom: 1px solid var(--live-glass-border);
+        }
+
+        .section-icon-box {
+            width: 52px;
+            height: 52px;
+            border-radius: var(--radius-md);
+            background: var(--live-accent-dim);
+            border: 1px solid var(--live-glass-border-active);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--live-accent);
+        }
+
+        .section-icon-box.cyan {
+            background: var(--live-cyan-dim);
+            border-color: rgba(0, 212, 255, 0.4);
+            color: var(--live-cyan);
+        }
+
+        .section-icon-box.amber {
+            background: var(--live-amber-dim);
+            border-color: rgba(245, 158, 11, 0.4);
+            color: var(--live-amber);
+        }
+
+        h2.section-heading {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.95rem;
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: -0.02em;
+        }
+
+        h3.block-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #ffffff;
+            margin: 1.8rem 0 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        p.text-lead {
+            font-size: 1.05rem;
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+
+        /* Pillars & Grids */
+        .grid-2col {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(460px, 1fr));
+            gap: 2rem;
+            margin-top: 1.5rem;
+        }
+
+        .grid-3col {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.8rem;
+            margin-top: 1.5rem;
+        }
+
+        .feature-box {
+            background: rgba(13, 42, 69, 0.65);
+            border: 1px solid var(--live-glass-border);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            transition: var(--transition-smooth);
+        }
+
+        .feature-box:hover {
+            border-color: rgba(0, 232, 0, 0.35);
+            transform: translateY(-3px);
+            background: rgba(18, 56, 92, 0.75);
+        }
+
+        .feature-box-title {
+            font-size: 1.22rem;
+            font-weight: 600;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .feature-box-desc {
+            font-size: 0.98rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        /* Special High-Impact Callout */
+        .callout-box {
+            border-radius: var(--radius-lg);
+            padding: 2rem 2.2rem;
+            margin: 2rem 0;
+            display: flex;
+            gap: 1.4rem;
+            align-items: flex-start;
+            border: 1px solid transparent;
+        }
+
+        .callout-box.info {
+            background: rgba(0, 212, 255, 0.08);
+            border-color: rgba(0, 212, 255, 0.3);
+        }
+
+        .callout-box.warning {
+            background: rgba(245, 158, 11, 0.09);
+            border-color: rgba(245, 158, 11, 0.35);
+        }
+
+        .callout-box.success {
+            background: rgba(0, 232, 0, 0.08);
+            border-color: rgba(0, 232, 0, 0.35);
+        }
+
+        .callout-icon {
+            font-size: 1.6rem;
+            flex-shrink: 0;
+            margin-top: 0.2rem;
+        }
+
+        .callout-content h4 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: #ffffff;
+        }
+
+        .callout-content p {
+            font-size: 0.98rem;
+            color: var(--text-secondary);
+            line-height: 1.72;
+        }
+
+        /* Visual Architecture Flow Diagram */
+        .flow-diagram {
+            background: rgba(4, 13, 26, 0.8);
+            border: 1px solid var(--live-glass-border);
+            border-radius: var(--radius-lg);
+            padding: 2.5rem;
+            margin: 2rem 0;
+            position: relative;
+        }
+
+        .flow-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            position: relative;
+        }
+
+        .flow-step-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1.4rem;
+            background: rgba(10, 36, 61, 0.85);
+            padding: 1.6rem 2rem;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--live-glass-border);
+            transition: var(--transition-smooth);
+        }
+
+        .flow-step-item:hover {
+            border-color: var(--live-accent);
+            transform: translateX(6px);
+        }
+
+        .step-number {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--live-accent);
+            color: var(--live-navy-deep);
+            font-weight: 800;
+            font-size: 1.15rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-family: 'Space Grotesk', sans-serif;
+            box-shadow: 0 0 15px var(--live-accent-glow);
+        }
+
+        .step-details h5 {
+            font-size: 1.12rem;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 0.35rem;
+        }
+
+        .step-details p {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            line-height: 1.65;
+        }
+
+        /* Executive Tables */
+        .table-wrap {
+            width: 100%;
+            overflow-x: auto;
+            margin: 1.8rem 0;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--live-glass-border);
+            background: rgba(4, 13, 26, 0.6);
+        }
+
+        table.executive-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.96rem;
+        }
+
+        table.executive-table thead tr {
+            background: rgba(10, 36, 61, 0.95);
+            border-bottom: 1px solid var(--live-glass-border);
+        }
+
+        table.executive-table th {
+            padding: 1.2rem 1.6rem;
+            color: #ffffff;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-size: 0.82rem;
+        }
+
+        table.executive-table td {
+            padding: 1.3rem 1.6rem;
+            color: var(--text-secondary);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            line-height: 1.65;
+        }
+
+        table.executive-table tbody tr:hover {
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        table.executive-table td strong {
+            color: #ffffff;
+        }
+
+        /* Status & Pills */
+        .badge-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.35rem 0.85rem;
+            border-radius: 50px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .badge-status.concluido {
+            background: var(--live-accent-dim);
+            color: var(--live-accent);
+            border: 1px solid rgba(0, 232, 0, 0.4);
+        }
+
+        .badge-status.vencido {
+            background: var(--live-red-dim);
+            color: var(--live-red);
+            border: 1px solid rgba(255, 59, 59, 0.4);
+        }
+
+        .badge-status.pendente {
+            background: var(--live-amber-dim);
+            color: var(--live-amber);
+            border: 1px solid rgba(245, 158, 11, 0.4);
+        }
+
+        .badge-status.ativo {
+            background: var(--live-cyan-dim);
+            color: var(--live-cyan);
+            border: 1px solid rgba(0, 212, 255, 0.4);
+        }
+
+        /* Code/Mono Snippets */
+        .code-box {
+            background: #020710;
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.88rem;
+            color: #93c5fd;
+            overflow-x: auto;
+            margin: 1.2rem 0;
+            line-height: 1.7;
+        }
+
+        /* Footer */
+        footer.executive-footer {
+            width: 100%;
+            border-top: 1px solid var(--live-glass-border);
+            padding: 3rem 2rem;
+            background: rgba(4, 13, 26, 0.95);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            text-align: center;
+            font-size: 0.92rem;
+            color: var(--text-muted);
+        }
+
+        footer.executive-footer strong {
+            color: #ffffff;
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            body {
+                font-size: 18px;
+            }
+            .header-nav {
+                display: none;
+            }
+            h1.hero-title {
+                font-size: 2.1rem;
+            }
+            .grid-2col {
+                grid-template-columns: 1fr;
+            }
+            .card-executive {
+                padding: 2rem 1.4rem;
+            }
+            section.hero-banner {
+                padding: 2.2rem 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Barra de Progresso Superior de Rolagem -->
+    <div id="scroll-progress-container">
+        <div id="scroll-progress-bar"></div>
+    </div>
+
+    <!-- Header Fixo Executivo -->
+    <header class="executive-header">
+        <div class="header-content">
+            <div class="brand-group">
+                <a href="#inicio" class="brand-logo-text">
+                    LIVE <span>CONSULTORIA</span>
+                </a>
+                <div class="divider-pill"></div>
+                <span class="client-pill">MLP ADVOGADOS</span>
+            </div>
+            <nav class="header-nav">
+                <a href="#emails" class="nav-item">Monitor de E-mails</a>
+                <a href="#contrato" class="nav-item">Contrato Themis</a>
+                <a href="#seguranca" class="nav-item">Claude, Gemini & LGPD</a>
+                <a href="#mitigacao" class="nav-item">Blindagem Meta</a>
+                <a href="#proximos-passos" class="nav-item">Auditoria & Prazos</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Fluxo Principal em Rolagem Contínua (One-Page Executivo) -->
+    <main class="presentation-flow" id="inicio">
+
+        <!-- 00. Hero Banner Executivo -->
+        <section class="hero-banner">
+            <div class="badge-live-tag">
+                <i data-lucide="shield-check" size="16"></i> Governança Estratégica & Inteligência Artificial
+            </div>
+            <h1 class="hero-title">
+                Arquitetura de <span class="highlight-green">Processamento de E-mails</span>, Segurança LGPD & Contrato Themis
+            </h1>
+            <p class="hero-subtitle">
+                Apresentação executiva e técnica das deliberações estratégicas da reunião de 28 de setembro de 2026. Alinhamento arquitetural do novo monitor de caixas fiscais e e-mails, validação do modelo econômico Themis e blindagem jurídica com conformidade rigorosa à LGPD via APIs corporativas da Anthropic e Google.
+            </p>
+            <div class="hero-meta-grid">
+                <div class="meta-cell">
+                    <span class="meta-label">Data da Reunião</span>
+                    <span class="meta-val"><i data-lucide="calendar" size="16"></i> 28 de Setembro de 2026</span>
+                </div>
+                <div class="meta-cell">
+                    <span class="meta-label">Interlocutor MLP</span>
+                    <span class="meta-val"><i data-lucide="user-check" size="16"></i> Dr. Rogério Magalhães</span>
+                </div>
+                <div class="meta-cell">
+                    <span class="meta-label">Consultoria Live</span>
+                    <span class="meta-val"><i data-lucide="briefcase" size="16"></i> Luiz Portal & Cléber Donato</span>
+                </div>
+                <div class="meta-cell">
+                    <span class="meta-label">Sócio Alinhado</span>
+                    <span class="meta-val"><i data-lucide="users" size="16"></i> Dr. Vinícius (Em alinhamento)</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- 01. Visão Executiva & Contexto Geral -->
+        <section class="card-executive">
+            <div class="section-header">
+                <div class="section-icon-box">
+                    <i data-lucide="compass" size="28"></i>
+                </div>
+                <div>
+                    <span class="meta-label">Diagnóstico de Decisão</span>
+                    <h2 class="section-heading">Sumário Executivo para Decisores (C-Level)</h2>
+                </div>
+            </div>
+
+            <p class="text-lead">
+                O encontro de 28/09 consolidou dois pilares estruturantes para a eficiência e segurança jurídica do escritório MLP Advogados e seus clientes corporativos:
+            </p>
+
+            <div class="grid-2col">
+                <div class="feature-box">
+                    <div class="feature-box-title">
+                        <i data-lucide="mail-search" style="color: var(--live-accent)"></i>
+                        1. Produto de Triagem de E-mails & Domicílios Fiscais
+                    </div>
+                    <p class="feature-box-desc">
+                        Mitigação do risco crítico de <strong>perda de prazos por leitura tácita</strong> em portais públicos (DTE, Receita Federal, e-CAC, Prefeituras e CNJ por CNPJ). Decisão pela arquitetura centralizada com gestão pela Live Consultoria ("caixa de Pandora"), assegurando o ativo intelectual e oferecendo suporte multiescritório antifrágil.
+                    </p>
+                </div>
+
+                <div class="feature-box">
+                    <div class="feature-box-title">
+                        <i data-lucide="file-check-2" style="color: var(--live-cyan)"></i>
+                        2. Fechamento do Contrato do Sistema Themis
+                    </div>
+                    <p class="feature-box-desc">
+                        Ratificação do acordo comercial com <strong>abono integral da taxa de implementação de R$ 28.790,00</strong> formalizado em Parágrafo Único por parceria estratégica, mantendo unicamente a manutenção operacional de R$ 1.650,00/mês e transparência absoluta nos custos diretos de terceiros.
+                    </p>
+                </div>
+            </div>
+
+            <div class="callout-box warning">
+                <div class="callout-icon">
+                    <i data-lucide="alert-triangle" style="color: var(--live-amber)"></i>
+                </div>
+                <div class="callout-content">
+                    <h4>Ponto de Atenção: Sanar Inseguranças do Sócio Dr. Vinícius</h4>
+                    <p>
+                        Devido a traumas de fornecedores anteriores, o Dr. Vinícius manifestou receios legítimos sobre risco de banimento de números do WhatsApp e dúvidas sobre a propriedade da IA rodar sobre modelos fundacionais (Anthropic/OpenAI/Google). Esta apresentação detalha tecnicamente a blindagem de ambas as frentes.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 02. Monitor de E-mails & Prazos Tácitos -->
+        <section class="card-executive" id="emails">
+            <div class="section-header">
+                <div class="section-icon-box">
+                    <i data-lucide="inbox" size="28"></i>
+                </div>
+                <div>
+                    <span class="meta-label">Inovação Operacional</span>
+                    <h2 class="section-heading">Arquitetura de Processamento de E-mails e Domicílios Fiscais</h2>
+                </div>
+            </div>
+
+            <h3 class="block-title"><i data-lucide="alert-octagon" size="20" style="color: var(--live-red)"></i> A Dor Crítica: O Silêncio da Leitura Tácita</h3>
+            <p class="text-lead">
+                Diferente do processo judicial tradicional físico, as citações e notificações em domicílios fiscais eletrônicos inauguram prazos fatais mesmo que nenhum advogado ou diretor abra a mensagem. Casos concretos levantados na reunião mostram que empresas de grande porte (como <strong>Línea Alimentos</strong> e clientes parceiros como <strong>Flávio</strong>) enfrentam risco processual diário por ausência de triagem centralizada.
+            </p>
+
+            <div class="grid-3col">
+                <div class="feature-box">
+                    <div class="feature-box-title"><i data-lucide="clock" size="20" style="color: var(--live-amber)"></i> Contagem Automática</div>
+                    <p class="feature-box-desc">
+                        Decorrido o prazo legal de disponibilização no portal (ex.: 10 a 15 dias conforme a legislação do órgão), a notificação é considerada formalmente lida e o prazo de recurso abre imediatamente.
+                    </p>
+                </div>
+                <div class="feature-box">
+                    <div class="feature-box-title"><i data-lucide="shield-alert" size="20" style="color: var(--live-red)"></i> Filtro Anti-Phishing</div>
+                    <p class="feature-box-desc">
+                        A proliferação de e-mails falsos com supostas intimações trabalhistas e fiscais gera confusão operacional. A IA analisa cabeçalhos e autenticidade de remetentes governamentais.
+                    </p>
+                </div>
+                <div class="feature-box">
+                    <div class="feature-box-title"><i data-lucide="git-merge" size="20" style="color: var(--live-cyan)"></i> Multiescritórios</div>
+                    <p class="feature-box-desc">
+                        Grandes clientes operam com 10 a 25 escritórios externos terceirizados. O sistema lê 100% da caixa e despacha o aviso exclusivamente para o patrono responsável pela área.
+                    </p>
+                </div>
+            </div>
+
+            <h3 class="block-title"><i data-lucide="cpu" size="20" style="color: var(--live-accent)"></i> Decisão Arquitetural: Centralização ("Caixa de Pandora")</h3>
+            <p class="text-lead">
+                Foram confrontadas duas abordagens técnicas para a viabilização comercial:
+            </p>
+
+            <div class="table-wrap">
+                <table class="executive-table">
+                    <thead>
+                        <tr>
+                            <th>Critério</th>
+                            <th>Opção 1: No Servidor do Cliente</th>
+                            <th>Opção 2: Centralizado pela Live (Aprovado)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Propriedade Intelectual</strong></td>
+                            <td>Vulnerável: o cliente herda a lógica e pode dispensar a consultoria.</td>
+                            <td><strong style="color: var(--live-accent)">Blindada:</strong> regras de inferência e esteira residem no ecossistema Live.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Antifragilidade & Aprendizado</strong></td>
+                            <td>Isolado: se a Receita mudar o leiaute, a caixa quebra individualmente.</td>
+                            <td><strong style="color: var(--live-accent)">Global:</strong> a IA detecta variações de padrão e aprende para todas as caixas.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Conformidade LGPD</strong></td>
+                            <td>Menor atrito formal inicial, mas custo de manutenção local elevado.</td>
+                            <td><strong style="color: var(--live-cyan)">Garantida via contrato:</strong> isolamento estrito e termos de confidencialidade técnica.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Velocidade de Deploy</strong></td>
+                            <td>Lenta: depende da autorização da TI interna de cada cliente corporativo.</td>
+                            <td><strong style="color: var(--live-accent)">Imediata:</strong> ativação em até 1 semana em regime piloto.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="callout-box success">
+                <div class="callout-icon">
+                    <i data-lucide="check-circle" style="color: var(--live-accent)"></i>
+                </div>
+                <div class="callout-content">
+                    <h4>Validação Prévia Realizada com Sucesso</h4>
+                    <p>
+                        A mecânica de leitura de caixas de entrada e filtragem inteligente já foi testada com pleno êxito na conta de contato do cliente de referência <strong>Okamoto</strong>, segregando spams, separando mensagens institucionais e processando anexos sem falhas. O próximo passo técnico exigido por Cléber Donato é a homologação em um cliente de alto fluxo real (ex.: Línea Alimentos) com R$ 1.200/mês ou 30 dias de cortesia.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 03. Fechamento Contratual Sistema Themis -->
+        <section class="card-executive" id="contrato">
+            <div class="section-header">
+                <div class="section-icon-box">
+                    <i data-lucide="file-text" size="28"></i>
+                </div>
+                <div>
+                    <span class="meta-label">Segurança Jurídica & Comercial</span>
+                    <h2 class="section-heading">Fechamento do Contrato Themis (MLP Advogados)</h2>
+                </div>
+            </div>
+
+            <p class="text-lead">
+                Todos os itens levantados pelo Dr. Rogério Magalhães e pela Coordenadora Administrativa Lucíola foram incorporados e saneados na minuta formal do contrato:
+            </p>
+
+            <div class="flow-diagram">
+                <div class="flow-steps">
+                    <div class="flow-step-item">
+                        <div class="step-number">1</div>
+                        <div class="step-details">
+                            <h5>Abono da Implementação via Parágrafo Único (Cláusula Sétima)</h5>
+                            <p>
+                                O instrumento mantém registrado o valor de tabela dos serviços de diagnóstico e arquitetura (<strong>R$ 28.790,00</strong>), protegendo o valor de mercado da tecnologia, mas estabelece que, por virtude da <strong>parceria estratégica</strong> de coinovação entre Live e MLP, o valor de setup será <strong>100% abonado</strong>.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="flow-step-item">
+                        <div class="step-number">2</div>
+                        <div class="step-details">
+                            <h5>Manutenção Operacional e Suporte Contínuo</h5>
+                            <p>
+                                Fixado o valor de <strong>R$ 1.650,00 mensais</strong> para governança, sustentação técnica, calibração contínua dos prompts e supervisão dos agentes Argos, Mentor Jurídico e Secretária Concierge.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="flow-step-item">
+                        <div class="step-number">3</div>
+                        <div class="step-details">
+                            <h5>Regra de Desintermediação e Transparência Total de Custos</h5>
+                            <p>
+                                A MLP mantém soberania financeira. A Live não embute margens sobre ferramentas de terceiros: chip celular dedicado (~R$ 60/mês), computador local (Estação Themis) e consumo de tokens faturados diretamente no cartão corporativo do escritório.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 04. Claude, Gemini, Segurança de Dados & LGPD (DESTAQUE ESPECIAL) -->
+        <section class="card-executive" id="seguranca">
+            <div class="section-header">
+                <div class="section-icon-box cyan">
+                    <i data-lucide="lock" size="28"></i>
+                </div>
+                <div>
+                    <span class="meta-label">Conformidade & Deep Tech</span>
+                    <h2 class="section-heading">APIs Claude e Gemini: Segurança de Dados e Conformidade LGPD</h2>
+                </div>
+            </div>
+
+            <div class="callout-box info">
+                <div class="callout-icon">
+                    <i data-lucide="info" style="color: var(--live-cyan)"></i>
+                </div>
+                <div class="callout-content">
+                    <h4>Esclarecimento Estrutural: A Diferença entre "API Corporativa" e "Chat Web Gratuito"</h4>
+                    <p>
+                        O temor manifestado pelo Dr. Vinícius ("as IAs usam dados de terceiros e a IA não é nossa") aplica-se exclusivamente a ferramentas de consumo pessoal gratuitas (como ChatGPT ou Copilot web comuns). O Sistema Themis utiliza <strong>APIs Comerciais B2B da Anthropic (Claude) e Google Cloud (Gemini)</strong>, regidas por contratos de privacidade corporativa com garantias legais e auditorias internacionais (SOC 2 Type II, ISO 27001).
+                    </p>
+                </div>
+            </div>
+
+            <h3 class="block-title"><i data-lucide="shield-check" size="20" style="color: var(--live-accent)"></i> 1. A Regra de Ouro: Cláusula de Não-Treinamento (No-Training Policy)</h3>
+            <p class="text-lead">
+                Tanto os Termos Comerciais da Anthropic (Commercial Terms of Service) quanto os termos do Google Cloud Vertex AI / Gemini API for Business garantem expressa e contratualmente:
+            </p>
+
+            <div class="grid-2col">
+                <div class="feature-box">
+                    <div class="feature-box-title">
+                        <i data-lucide="check-check" style="color: var(--live-accent)"></i> Anthropic Claude API (Commercial)
+                    </div>
+                    <ul style="padding-left: 1.2rem; font-size: 0.96rem; color: var(--text-secondary); line-height: 1.8;">
+                        <li><strong>Zero Treinamento:</strong> Nenhum dado enviado (prompts, anexos, petições) é utilizado para treinar ou aprimorar os modelos fundacionais Claude.</li>
+                        <li><strong>Zero Data Retention:</strong> As requisições são efêmeras (stateless). Após gerar a resposta, a memória de inferência é descartada.</li>
+                        <li><strong>Controle de Jurisdição:</strong> Infraestrutura corporativa hospedada em data centers com certificação de segurança de nível bancário.</li>
+                    </ul>
+                </div>
+
+                <div class="feature-box">
+                    <div class="feature-box-title">
+                        <i data-lucide="check-check" style="color: var(--live-cyan)"></i> Google Gemini API (Enterprise / Vertex AI)
+                    </div>
+                    <ul style="padding-left: 1.2rem; font-size: 0.96rem; color: var(--text-secondary); line-height: 1.8;">
+                        <li><strong>Customer Data Ownership:</strong> O cliente detém a propriedade exclusiva e irrestrita de todos os dados trafegados.</li>
+                        <li><strong>Isolamento Lógico:</strong> Não há compartilhamento de parâmetros ou vetores de contexto entre clientes distintos.</li>
+                        <li><strong>Conformidade Internacional:</strong> Atendimento direto a GDPR (Europa), HIPAA (Saúde) e LGPD (Brasil).</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3 class="block-title"><i data-lucide="server" size="20" style="color: var(--live-cyan)"></i> 2. Soberania Local na "Estação Themis"</h3>
+            <p class="text-lead">
+                A privacidade no Sistema Themis não depende unicamente da nuvem das LLMs. A arquitetura foi concebida sob o paradigma da <strong>Soberania Local de Dados</strong>:
+            </p>
+
+            <div class="grid-3col">
+                <div class="feature-box">
+                    <div class="feature-box-title"><i data-lucide="hard-drive" size="20" style="color: var(--live-accent)"></i> 100% On-Premise</div>
+                    <p class="feature-box-desc">
+                        A Estação Themis é um desktop físico instalado dentro da sede da MLP. Credenciais do LegalOne, sessões de WhatsApp e banco de dados residem fisicamente no escritório.
+                    </p>
+                </div>
+                <div class="feature-box">
+                    <div class="feature-box-title"><i data-lucide="file-code" size="20" style="color: var(--live-cyan)"></i> Sanitização de PII</div>
+                    <p class="feature-box-desc">
+                        Antes de enviar qualquer trecho de texto para raciocínio nas APIs, o script local executa filtro de ofuscação (mascarando CPFs, contas e dados sensíveis desnecessários).
+                    </p>
+                </div>
+                <div class="feature-box">
+                    <div class="feature-box-title"><i data-lucide="key" size="20" style="color: var(--live-amber)"></i> Criptografia Robusta</div>
+                    <p class="feature-box-desc">
+                        Todo o tráfego externo entre a Estação Themis e as APIs é blindado via protocolo criptográfico <strong>TLS 1.3</strong> com chaves assimétricas de 256 bits.
+                    </p>
+                </div>
+            </div>
+
+            <h3 class="block-title"><i data-lucide="scale" size="20" style="color: var(--live-accent)"></i> 3. Conformidade com a LGPD e Prerrogativas da OAB</h3>
+            <p class="text-lead">
+                O projeto foi estruturado para cumprir com rigor os preceitos da <strong>Lei nº 13.709/2018 (LGPD)</strong> e o sigilo profissional privativo da advocacia:
+            </p>
+
+            <div class="table-wrap">
+                <table class="executive-table">
+                    <thead>
+                        <tr>
+                            <th>Princípio LGPD</th>
+                            <th>Aplicação no Sistema Themis</th>
+                            <th>Fundamento Legal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Finalidade e Adequação</strong></td>
+                            <td>O processamento é estritamente restrito à gestão de prazos processuais e triagem qualificada de consultas.</td>
+                            <td>Art. 6º, I e II da LGPD</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Necessidade (Minimização)</strong></td>
+                            <td>Apenas os metadados estritamente essenciais para classificar a demanda trafegam via API; nenhum acervo integral é exposto.</td>
+                            <td>Art. 6º, III da LGPD</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Segurança e Confidencialidade</strong></td>
+                            <td>Isolamento em máquina local, descarte pós-inferência e canal TLS 1.3, resguardando o sigilo cliente-advogado.</td>
+                            <td>Art. 6º, VII e Art. 46 da LGPD</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Base Legal Aplicável</strong></td>
+                            <td>Execução de contrato de prestação de serviços jurídicos e legítimo interesse operacional da atividade advocatícia.</td>
+                            <td>Art. 7º, V e IX da LGPD</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3 class="block-title"><i data-lucide="cpu" size="20" style="color: var(--live-cyan)"></i> 4. O que Significa "A IA é Nossa"?</h3>
+            <p class="text-lead">
+                Na mentoria mencionada pelo Dr. Vinícius, é correto afirmar que os modelos fundacionais de linguagem pertencem à Anthropic e ao Google. No entanto, <strong>o modelo em si é apenas um processador linguístico genérico</strong>. A verdadeira propriedade intelectual do escritório (o "Moat") é composta por:
+            </p>
+
+            <div class="code-box">
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│  O ATIVO PROPRIETÁRIO DO SISTEMA THEMIS (PATRIMÔNIO OPERACIONAL DA MLP ADVOGADOS)      │
+├────────────────────────────────────────────────────────────────────────────────────────┤
+│  1. A Matriz de Legitimidade Operacional (6 níveis de escalonamento N0 a N5)          │
+│  2. A Ontologia Jurídica e Prompts de Triagem calibratedos para Tributário e Cível     │
+│  3. As Regras de Negócio e Réguas de SLA (Tripla régua: D2, D1 e Fatal)                │
+│  4. Os Conectores Locais de Integração com LegalOne e ClickUp                          │
+│  5. A Base Histórica de Resoluções e Jurisprudência Interna do Escritório              │
+└────────────────────────────────────────────────────────────────────────────────────────┘
+                                      ▼ consome apenas como motor de inferência
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│  PROVEDORES DE INFRAESTRUTURA EXTERNA (APIs COMERCIAIS ZERO-RETENTION)                 │
+│  • Anthropic Claude 3.5 Sonnet / Haiku API  |  • Google Gemini 1.5 Pro / Flash API    │
+└────────────────────────────────────────────────────────────────────────────────────────┘
+            </div>
+            <p class="feature-box-desc">
+                Analogia para C-Level: A Microsoft ou a Oracle não são proprietárias da eletricidade ou dos chips de silício da Intel, mas são proprietárias dos softwares que rodam sobre eles. O Themis é o software e a inteligência jurídica proprietária da MLP Advogados.
+            </p>
+        </section>
+
+        <!-- 05. Mitigação do Risco Meta / WhatsApp -->
+        <section class="card-executive" id="mitigacao">
+            <div class="section-header">
+                <div class="section-icon-box amber">
+                    <i data-lucide="message-square-off" size="28"></i>
+                </div>
+                <div>
+                    <span class="meta-label">Gestão de Continuidade</span>
+                    <h2 class="section-heading">Blindagem Técnica Anti-Banimento (Meta / WhatsApp)</h2>
+                </div>
+            </div>
+
+            <p class="text-lead">
+                O receio de que colaboradores ou clientes tenham seus números suspensos ou derrubados foi integralmente neutralizado pela engenharia do projeto:
+            </p>
+
+            <div class="grid-2col">
+                <div class="feature-box">
+                    <div class="feature-box-title">
+                        <i data-lucide="shield-check" style="color: var(--live-accent)"></i> Isolamento Absoluto de Números
+                    </div>
+                    <p class="feature-box-desc">
+                        Nenhum software ou script roda nos números de telefone do Dr. Rogério, Dr. Vinícius, advogados associados ou clientes. O sistema opera exclusivamente em um <strong>chip institucional dedicado e novo</strong>, adquirido pela MLP exclusivamente para o agente.
+                    </p>
+                </div>
+
+                <div class="feature-box">
+                    <div class="feature-box-title">
+                        <i data-lucide="eye-off" style="color: var(--live-cyan)"></i> Agente Argos em Vigília Silenciosa
+                    </div>
+                    <p class="feature-box-desc">
+                        O Agente Argos atua em <strong>regime estrito de somente leitura</strong>. Ele não envia mensagens, não responde em grupos de clientes e não dispara transmissões em massa. Para a Meta, ele se comporta como um leitor passivo em navegador comum.
+                    </p>
+                </div>
+
+                <div class="feature-box">
+                    <div class="feature-box-title">
+                        <i data-lucide="hourglass" style="color: var(--live-amber)"></i> Delays Humanos e Aquecimento
+                    </div>
+                    <p class="feature-box-desc">
+                        Para o Agente Secretária Concierge, as respostas em grupos canônicos contam com <strong>delays randômicos humanos de 30 a 60 segundos</strong>, aquecimento prévio de 14 dias da linha e entrada gradual limitada a 5 a 7 grupos por dia na área piloto.
+                    </p>
+                </div>
+
+                <div class="feature-box">
+                    <div class="feature-box-title">
+                        <i data-lucide="user-x" style="color: var(--live-red)"></i> Zero Risco aos Participantes do Grupo
+                    </div>
+                    <p class="feature-box-desc">
+                        A moderação do WhatsApp pune contas que praticam spam ativo individual. Jamais na história da plataforma participantes legítimos de um grupo foram banidos pela mera presença de um contato secundário.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 06. Próximos Passos & Auditoria de Prazos -->
+        <section class="card-executive" id="proximos-passos">
+            <div class="section-header">
+                <div class="section-icon-box">
+                    <i data-lucide="calendar-check" size="28"></i>
+                </div>
+                <div>
+                    <span class="meta-label">Execução & Governança</span>
+                    <h2 class="section-heading">Próximos Passos & Auditoria Contínua de Prazos</h2>
+                </div>
+            </div>
+
+            <h3 class="block-title"><i data-lucide="list-ordered" size="20" style="color: var(--live-accent)"></i> Ações Imediatas Pós-Reunião</h3>
+
+            <div class="table-wrap">
+                <table class="executive-table">
+                    <thead>
+                        <tr>
+                            <th>Ação / Entregável</th>
+                            <th>Responsável</th>
+                            <th>Prazo</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Ajuste e Envio da Minuta Contratual</strong> (com isenção de setup e acesso liberado)</td>
+                            <td>Luiz Portal</td>
+                            <td>Imediato</td>
+                            <td><span class="badge-status concluido">Concluído (29/09)</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Envio da Planilha de Simulação de Tokens</strong></td>
+                            <td>Cléber Donato / Luiz</td>
+                            <td>A definir</td>
+                            <td><span class="badge-status ativo">Pronto p/ Envio</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Compartilhamento da Tabela de Prazos Tácitos por Órgão</strong></td>
+                            <td>Luiz Portal</td>
+                            <td>A definir</td>
+                            <td><span class="badge-status pendente">A Enviar</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Estruturação das Dúvidas Técnicas do Dr. Vinícius</strong></td>
+                            <td>Dr. Rogério / Dr. Vinícius</td>
+                            <td>A definir</td>
+                            <td><span class="badge-status pendente">Em elaboração</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Coleta de Amostras de E-mails Fiscais Reais</strong> (Bruno / Ivan)</td>
+                            <td>Dr. Rogério Magalhães</td>
+                            <td>A definir</td>
+                            <td><span class="badge-status pendente">Em andamento</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Definição do Cliente Piloto do Monitor de E-mails</strong> (ex.: Línea)</td>
+                            <td>Dr. Rogério / Luiz Portal</td>
+                            <td>A definir</td>
+                            <td><span class="badge-status pendente">A formalizar</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="callout-box warning" style="margin-top: 2.5rem;">
+                <div class="callout-icon">
+                    <i data-lucide="alert-octagon" style="color: var(--live-red)"></i>
+                </div>
+                <div class="callout-content">
+                    <h4>Alerta de Auditoria Contínua de Prazos do Projeto Themis (Posição em 07/10/2026)</h4>
+                    <p>
+                        Em conformidade com a política de governança da Live Consultoria, o cruzamento do plano de ação com a data de hoje indica que as entregas operacionais preliminares (contratação do Claude corporativo, levantamento de grupos pelas coordenações, liberação de acessos ao LegalOne e preenchimento da Matriz de Legitimidade) estavam previstas para meados de setembro e encontram-se <strong>vencidas/represadas</strong> pela finalização do contrato.
+                    </p>
+                    <p style="margin-top: 0.8rem; font-weight: 600; color: #ffffff;">
+                        Recomendação: Realizar a assinatura imediata do contrato formalizado e reprogramar a largada das 4 fases (45 dias) a partir da data de assinatura.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Rodapé Institucional -->
+    <footer class="executive-footer">
+        <p>© 2026 <strong>Live Consultoria</strong>. Todos os direitos reservados.</p>
+        <p>Padrão Técnico e Identidade Visual V6.0 — Design System Glassmorphism para C-Level</p>
+        <p style="font-size: 0.8rem; color: var(--text-caption);">Consultores: Cléber Donato & Luiz Portal | Cliente: MLP Advogados</p>
+    </footer>
+
+    <!-- Script de Interatividade e Lucide Icons -->
+    <script>
+        // Inicializa ícones Lucide
+        lucide.createIcons();
+
+        // Barra de progresso de rolagem contínua (Scroll Progress Bar)
+        window.addEventListener('scroll', () => {
+            const winScroll = document.documentElement.scrollTop || document.body.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            const bar = document.getElementById('scroll-progress-bar');
+            if (bar) {
+                bar.style.width = scrolled + '%';
+            }
+        });
+    </script>
+</body>
+</html>
