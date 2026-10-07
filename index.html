@@ -921,6 +921,15 @@
                     <p>
                         O temor manifestado pelo Dr. Vinícius ("as IAs usam dados de terceiros e a IA não é nossa") aplica-se exclusivamente a ferramentas de consumo pessoal gratuitas (como ChatGPT ou Copilot web comuns). O Sistema Themis utiliza <strong>APIs Comerciais B2B da Anthropic (Claude) e Google Cloud (Gemini)</strong>, regidas por contratos de privacidade corporativa com garantias legais e auditorias internacionais (SOC 2 Type II, ISO 27001).
                     </p>
+                    <p style="margin-top: 0.8rem;">
+                        A utilização das APIs passa por um <strong>filtro interno criterioso que classifica informações sigilosas</strong>, evitando a exposição de dados sensíveis e mitigando o risco de vazamentos. Além disso, a configuração padrão da API da Anthropic só armazena dados de feedback caso haja <strong>autorização expressa do usuário</strong>, assegurando que nada seja retido sem consentimento.
+                    </p>
+                    <p style="margin-top: 0.8rem;">
+                        <a href="https://privacy.claude.com/en/articles/7996868-is-my-data-used-for-model-training" target="_blank" rel="noopener noreferrer" style="color: var(--live-cyan); font-weight: 600; text-decoration: underline; display: inline-flex; align-items: center; gap: 0.4rem;">
+                            <span>Consulte a política oficial: Anthropic Privacy — Is my data used for model training?</span>
+                            <i data-lucide="external-link" size="14"></i>
+                        </a>
+                    </p>
                 </div>
             </div>
 
@@ -935,9 +944,8 @@
                         <i data-lucide="check-check" style="color: var(--live-accent)"></i> Anthropic Claude API (Commercial)
                     </div>
                     <ul style="padding-left: 1.2rem; font-size: 0.96rem; color: var(--text-secondary); line-height: 1.8;">
-                        <li><strong>Zero Treinamento:</strong> Nenhum dado enviado (prompts, anexos, petições) é utilizado para treinar ou aprimorar os modelos fundacionais Claude.</li>
-                        <li><strong>Zero Data Retention:</strong> As requisições são efêmeras (stateless). Após gerar a resposta, a memória de inferência é descartada.</li>
-                        <li><strong>Controle de Jurisdição:</strong> Infraestrutura corporativa hospedada em data centers com certificação de segurança de nível bancário.</li>
+                        <li><strong>Escolha do Usuário & Não Compartilhamento:</strong> A Anthropic assegura contratualmente a prerrogativa e a possibilidade de escolha expressa para que o usuário <strong>não compartilhe suas informações para o treinamento dos modelos</strong>.</li>
+                        <li><strong>Zero Data Retention:</strong> As requisições via API são efêmeras (stateless). Após processar e gerar a resposta, a memória de inferência é descartada.</li>
                     </ul>
                 </div>
 
@@ -1093,7 +1101,13 @@
                         <i data-lucide="user-x" style="color: var(--live-red)"></i> Zero Risco aos Participantes do Grupo
                     </div>
                     <p class="feature-box-desc">
-                        A moderação do WhatsApp pune contas que praticam spam ativo individual. Jamais na história da plataforma participantes legítimos de um grupo foram banidos pela mera presença de um contato secundário.
+                        A moderação do WhatsApp não suspende participantes legítimos pela mera presença de um contato secundário no grupo. Conforme esclarece a própria documentação da plataforma, <strong>grupos podem ser suspensos se transgredirem termos de serviço (o grupo em si pode ser suspenso, não os usuários participantes)</strong>.
+                    </p>
+                    <p style="margin-top: 0.6rem;">
+                        <a href="https://faq.whatsapp.com/679236580386110" target="_blank" rel="noopener noreferrer" style="color: var(--live-cyan); font-size: 0.88rem; font-weight: 600; text-decoration: underline; display: inline-flex; align-items: center; gap: 0.35rem;">
+                            <span>Consulte a FAQ Oficial do WhatsApp: Sobre grupos suspensos</span>
+                            <i data-lucide="external-link" size="13"></i>
+                        </a>
                     </p>
                 </div>
             </div>
